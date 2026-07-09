@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+
+# builds
+.next
+dist
+out
+build
+
+# logs
+*.log
+pnpm-debug.log*
+
+# env
+.env*
+!.env.example
+
+# OS
+.DS_Store
+
+# IDE
+.vscode
+.idea
+
+# coverage
+coverage
+
+# pnpm
+.pnpm-store
+

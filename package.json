@@ -1,0 +1,7 @@
+{
+  "name": "nysc",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --paralel --filter './api' --filter './web' dev"
+  }
+}

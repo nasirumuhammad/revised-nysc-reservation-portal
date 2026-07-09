@@ -1,0 +1,16 @@
+{
+  "name": "@nysc/types",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@nysc/enums": "workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1"
+}
