@@ -16,7 +16,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/signin.dto';
 import { maskEmail } from '@/common/utils/mask.util';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import {
   ForgotPasswordOtpEventPayload,
@@ -25,6 +25,10 @@ import {
   UserLoginEventPayload,
 } from '@/common/constants/system-events.constant';
 import { TokenService } from './token.service';
+import { HashingService } from '@/common/services/hash.service';
+import { StudentSignInDto } from './dto/student-signin.dto';
+import { StudentProfile } from '@/student/entity/student-profile.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +48,9 @@ export class AuthService {
     private readonly eventEmitter: EventEmitter2,
     private readonly datasource: DataSource,
     private readonly tokenService: TokenService,
+    private readonly hashingService: HashingService,
+    @InjectRepository(StudentProfile)
+    private readonly studentProfileRepository: Repository<StudentProfile>,
   ) {
     this.resetSecret =
       this.configService.getOrThrow<string>('JWT_RESET_SECRET');
@@ -65,17 +72,33 @@ export class AuthService {
   }
 
   async signinStudent(
-    signInDto: SignInDto,
+    payload: StudentSignInDto,
   ): Promise<{ refreshToken: string; accessToken: string }> {
-    const { email, password } = signInDto;
-    const user = await this.tokenService.validateCredentials(email, password);
+    const { registrationNumber, password } = payload;
+
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { registrationNumber },
+      relations: { profile: { user: true } },
+    });
+
+    const user = studentProfile?.profile?.user;
+
+    if (
+      !user ||
+      !(await this.hashingService.compare(password, user.password))
+    ) {
+      this.logger.warn(
+        { registrationNumber },
+        'student signin failed: invalid credentials',
+      );
+      throw new UnauthorizedException(this.AUTH_FAILED_MESSAGE);
+    }
 
     const tokens = await this.issueTokenPair(user);
     this.logger.log(
-      { email: maskEmail(email) },
-      'direct signin succeeded tokens issued',
+      { userId: user.id },
+      'student signin succeeded tokens issued',
     );
-
     return tokens;
   }
 

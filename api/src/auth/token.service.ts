@@ -12,7 +12,7 @@ import { StringValue } from 'ms';
 @Injectable()
 export class TokenService {
   private readonly AUTH_FAILED_MESSAGE =
-    'Authentication failed. Please sign in again.';
+    'Authentication failed. Invalid email or password.';
 
   private readonly resetExpiry: StringValue;
   private readonly jwtRefreshSecret: string;
@@ -54,6 +54,7 @@ export class TokenService {
       jti: randomUUID(),
       sub: user.id,
       tokenVersion: user.tokenVersion,
+      role: user.role,
     };
   }
 

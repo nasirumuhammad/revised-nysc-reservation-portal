@@ -13,6 +13,8 @@ import { PasswordResetController } from './controllers/password-reset.controller
 import { OtpModule } from '@/otp/otp.module';
 import { TokenService } from './token.service';
 import { AuthController } from './controllers/auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { StudentProfile } from '@/student/entity/student-profile.entity';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { AuthController } from './controllers/auth.controller';
     UserModule,
     CommonModule,
     RefreshTokenModule,
+    TypeOrmModule.forFeature([StudentProfile]),
     OtpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

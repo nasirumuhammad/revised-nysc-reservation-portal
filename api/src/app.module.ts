@@ -8,6 +8,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { CommonModule } from './common/common.module';
 import { EmailModule } from './email/email.module';
 import { GlobalConfigModule } from './common/modules/global.module';
+import { StudentModule } from './student/student.module';
+import { DepartmentModule } from './department/department.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { GlobalConfigModule } from './common/modules/global.module';
     CommonModule,
     EmailModule,
     AuthModule,
+    StudentModule,
+    DepartmentModule,
+    StaffModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

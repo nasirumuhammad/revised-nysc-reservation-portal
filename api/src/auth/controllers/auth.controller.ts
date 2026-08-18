@@ -13,6 +13,7 @@ import { SignInResponse } from '../types/response.type';
 import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
 import { Payload } from '@/types/payload.type';
 import { JwtGuard } from '../guards/jwt.guard';
+import { StudentSignInDto } from '../dto/student-signin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,7 +27,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('signin/student')
-  studentSignIn(@Body() payload: SignInDto): Promise<SignInResponse> {
+  studentSignIn(@Body() payload: StudentSignInDto): Promise<SignInResponse> {
     return this.authService.signinStudent(payload);
   }
 

@@ -4,6 +4,7 @@ export type Payload = {
   sub: string;
   tokenVersion: number;
   jti: string;
+  role: Role;
 };
 
 export type ResetPasswordPayload = {

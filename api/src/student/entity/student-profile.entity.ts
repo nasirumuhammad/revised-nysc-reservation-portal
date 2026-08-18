@@ -3,12 +3,14 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ClassOfDegree, Gender } from '@/common/enums';
 import { Marital_status } from '@/enums';
 import { Profile } from '@/user/entity/profile.entity';
+import { Department } from '@/department/entity/department.dto';
 
 @Entity('students_profile')
 export class StudentProfile {
@@ -36,6 +38,9 @@ export class StudentProfile {
   @Column({ type: 'boolean', default: false })
   isMilitary!: boolean;
 
+  @Column({ type: 'varchar', length: 100 })
+  stateOfOrigin!: string;
+
   @Column({ type: 'varchar', length: 50, unique: true })
   registrationNumber!: string;
 
@@ -44,6 +49,12 @@ export class StudentProfile {
   })
   @JoinColumn({ name: 'profile_id' })
   profile!: Profile;
+
+  @ManyToOne(() => Department, (department) => department.profiles, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  department?: Department;
 
   @DeleteDateColumn()
   deletedAt?: Date;
