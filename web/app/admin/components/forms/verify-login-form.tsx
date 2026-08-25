@@ -8,11 +8,9 @@ import z from "zod";
 
 import { verifyOtpSchema } from "@/schemas/verify-otp.schema";
 import { authApi } from "@/lib/api/auth";
-import { tokenStorage } from "@/lib/api/token-storage";
 import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 import FormHeading from "@/components/form-heading";
-import { AuthLayout } from "../../components/authlayout";
 import { BackLink } from "../../components/back-link";
 import { FormError } from "../../components/form-error";
 import { OtpField } from "../../components/otp-field";
@@ -45,25 +43,41 @@ function VerifySigninOtpForm() {
   async function onSubmit(data: FormSchema) {
     try {
       const tokens = await authApi.verifySigninOtp(data);
+
       if (!tokens) {
         setError("root", {
           message: "Something went wrong. Please try again.",
         });
         return;
       }
-      tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
+
+      const response = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tokens),
+      });
+
+      if (!response.ok) {
+        setError("root", {
+          message: "Unable to create your session. Please try again.",
+        });
+        return;
+      }
+
       markRedirecting();
       router.push("/admin/students");
     } catch (error) {
       if (error instanceof ApiError) {
         const handled = applyFieldErrors(error, setError);
+
         if (!handled) {
           setError("root", { message: error.message });
         }
       }
     }
   }
-
   async function handleResend() {
     if (!email) return;
     await authApi.resendLoginOtp(email);

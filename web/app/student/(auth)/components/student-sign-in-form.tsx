@@ -9,13 +9,11 @@ import z from "zod";
 
 import { studentSigninSchema } from "@/schemas/student-signin.schema";
 import { authApi } from "@/lib/api/auth";
-import { tokenStorage } from "@/lib/api/token-storage";
 import { Button } from "@/components/ui/button";
 import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
 import { FormError } from "@/app/admin/components/form-error";
 import { RegNumberField } from "@/components/reg-number-field";
 import { PasswordField } from "@/app/admin/components/password-field";
-import Link from "next/link";
 import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 type FormSchema = z.infer<typeof studentSigninSchema>;
@@ -41,19 +39,38 @@ export function StudentSigninForm() {
   async function onSubmit(data: FormSchema) {
     try {
       const tokens = await authApi.studentSignIn(data);
+
       if (!tokens) {
         setError("root", {
           message: "Something went wrong. Please try again.",
         });
         return;
       }
-      tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
+
+      const response = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tokens),
+      });
+
+      if (!response.ok) {
+        setError("root", {
+          message: "Unable to create your session. Please try again.",
+        });
+        return;
+      }
+
       markRedirecting();
       router.push("/student/dashboard");
     } catch (error) {
       if (error instanceof ApiError) {
         const handled = applyFieldErrors(error, setError);
-        if (!handled) setError("root", { message: error.message });
+
+        if (!handled) {
+          setError("root", { message: error.message });
+        }
       }
     }
   }
