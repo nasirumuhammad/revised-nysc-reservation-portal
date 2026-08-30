@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   response.cookies.set("refreshToken", "", cookieOptions);
 
   if (refreshToken) {
-    fetch(`${BASE_URL}/auth/signout`, {
+    await fetch(`${BASE_URL}/auth/signout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
