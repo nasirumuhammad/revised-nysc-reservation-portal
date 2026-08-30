@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { setAuthCookies } from "@/lib/api/cookie-config";
 
 const BASE_URL = process.env.API_URL;
 
@@ -26,36 +27,13 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // Check if result.data exists
-  if (!result?.data) {
-    console.error("No data in response:", result);
-    return NextResponse.json(
-      { message: "Invalid response from server" },
-      { status: 500 },
-    );
-  }
-
   const { accessToken, refreshToken } = result.data;
 
   const nextResponse = NextResponse.json({
     message: result.message || "OTP verified successfully",
   });
 
-  nextResponse.cookies.set("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 15, // 15 minutes
-  });
-
-  nextResponse.cookies.set("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  });
+  setAuthCookies(nextResponse, { accessToken, refreshToken });
 
   return nextResponse;
 }

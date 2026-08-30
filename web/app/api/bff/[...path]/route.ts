@@ -1,47 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { refreshTokens } from "@/lib/api/refresh-session";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  setAuthCookies,
+} from "@/lib/api/cookie-config";
 
 const BASE_URL = process.env.API_URL;
 
 if (!BASE_URL) {
   throw new Error("API_URL is not defined");
-}
-
-type TokenPair = {
-  accessToken: string;
-  refreshToken: string;
-};
-
-type ApiResponse<T> = {
-  message?: string;
-  data?: T;
-  errors?: Record<string, string[]>;
-};
-
-async function refreshTokens(request: NextRequest): Promise<TokenPair | null> {
-  const refreshToken = request.cookies.get("refreshToken")?.value;
-
-  if (!refreshToken) {
-    return null;
-  }
-
-  const response = await fetch(`${BASE_URL}/auth/refresh`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${refreshToken}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
-
-  const result = (await response
-    .json()
-    .catch(() => null)) as ApiResponse<TokenPair> | null;
-
-  if (!response.ok || !result?.data) {
-    return null;
-  }
-
-  return result.data;
 }
 
 function isBinaryResponse(contentType: string): boolean {
@@ -93,7 +61,7 @@ async function bffRequest(
   pathSegments: string[],
 ): Promise<NextResponse> {
   const endpoint = `/${pathSegments.join("/")}`;
-  const accessToken = request.cookies.get("accessToken")?.value;
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
 
   const makeRequest = async (token: string | undefined) => {
     const headers = new Headers();
@@ -125,28 +93,14 @@ async function bffRequest(
   let response = await makeRequest(accessToken);
 
   if (response.status === 401) {
-    const tokens = await refreshTokens(request);
+    const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
+    const tokens = refreshToken ? await refreshTokens(refreshToken) : null;
 
     if (tokens) {
       response = await makeRequest(tokens.accessToken);
 
       const nextResponse = await createProxyResponse(response);
-
-      nextResponse.cookies.set("accessToken", tokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 15 * 60,
-      });
-
-      nextResponse.cookies.set("refreshToken", tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-      });
+      setAuthCookies(nextResponse, tokens);
 
       return nextResponse;
     }

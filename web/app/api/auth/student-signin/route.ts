@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { setAuthCookies } from "@/lib/api/cookie-config";
 
 const BASE_URL = process.env.API_URL;
 
@@ -32,21 +33,7 @@ export async function POST(request: NextRequest) {
     message: result.message || "Authentication successful",
   });
 
-  nextResponse.cookies.set("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 15, // 15 minutes
-  });
-
-  nextResponse.cookies.set("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  });
+  setAuthCookies(nextResponse, { accessToken, refreshToken });
 
   return nextResponse;
 }

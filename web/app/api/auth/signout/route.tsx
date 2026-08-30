@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  REFRESH_TOKEN_COOKIE,
+  clearAuthCookies,
+} from "@/lib/api/cookie-config";
 
 const BASE_URL = process.env.API_URL;
 
@@ -7,29 +11,7 @@ if (!BASE_URL) {
 }
 
 export async function POST(request: NextRequest) {
-  const refreshToken = request.cookies.get("refreshToken")?.value;
-
-  const response = NextResponse.json(
-    {
-      message: "Signed out successfully",
-      success: true,
-    },
-    { status: 200 },
-  );
-
-  response.cookies.delete("accessToken");
-  response.cookies.delete("refreshToken");
-
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
-    path: "/",
-    maxAge: 0,
-  };
-
-  response.cookies.set("accessToken", "", cookieOptions);
-  response.cookies.set("refreshToken", "", cookieOptions);
+  const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
   if (refreshToken) {
     await fetch(`${BASE_URL}/auth/signout`, {
@@ -43,6 +25,16 @@ export async function POST(request: NextRequest) {
       console.warn("Failed to invalidate token on NestJS:", error);
     });
   }
+
+  const response = NextResponse.json(
+    {
+      message: "Signed out successfully",
+      success: true,
+    },
+    { status: 200 },
+  );
+
+  clearAuthCookies(response);
 
   return response;
 }
