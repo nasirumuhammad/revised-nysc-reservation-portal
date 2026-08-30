@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { authApi } from "@/lib/api/auth";
-import { tokenStorage } from "@/lib/api/token-storage";
 
 type AdminProfileProps = {
   name?: string;
@@ -35,14 +34,22 @@ export function AdminProfile({
 }: AdminProfileProps) {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSignOut() {
     setIsSigningOut(true);
+    setError(null);
+
     try {
       await authApi.signout();
-    } finally {
-      tokenStorage.clear();
+
       router.push("/admin");
+      router.refresh();
+    } catch (error) {
+      router.push("/admin");
+      router.refresh();
+    } finally {
+      setIsSigningOut(false);
     }
   }
 

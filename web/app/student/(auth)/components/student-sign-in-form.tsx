@@ -14,8 +14,9 @@ import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
 import { FormError } from "@/app/admin/components/form-error";
 import { RegNumberField } from "@/components/reg-number-field";
 import { PasswordField } from "@/app/admin/components/password-field";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
+import { ApiError } from "@/lib/api/api-error";
+import Image from "next/image";
 type FormSchema = z.infer<typeof studentSigninSchema>;
 
 export function StudentSigninForm() {
@@ -38,29 +39,7 @@ export function StudentSigninForm() {
 
   async function onSubmit(data: FormSchema) {
     try {
-      const tokens = await authApi.studentSignIn(data);
-
-      if (!tokens) {
-        setError("root", {
-          message: "Something went wrong. Please try again.",
-        });
-        return;
-      }
-
-      const response = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(tokens),
-      });
-
-      if (!response.ok) {
-        setError("root", {
-          message: "Unable to create your session. Please try again.",
-        });
-        return;
-      }
+      await authApi.studentSignIn(data);
 
       markRedirecting();
       router.push("/student/dashboard");
@@ -71,6 +50,10 @@ export function StudentSigninForm() {
         if (!handled) {
           setError("root", { message: error.message });
         }
+      } else {
+        setError("root", {
+          message: "Something went wrong. Please try again.",
+        });
       }
     }
   }
@@ -79,6 +62,11 @@ export function StudentSigninForm() {
 
   return (
     <>
+      <div className="w-full flex justify-center">
+        <div className="relative w-[80px] h-[80px]">
+          <Image src={"/abu-logo.png"} alt="abu logo" fill />
+        </div>
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mt-8 flex flex-col gap-5 p-6 items-center justify-center "

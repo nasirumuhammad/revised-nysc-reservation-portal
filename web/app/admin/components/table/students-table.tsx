@@ -4,7 +4,6 @@ import { Download, Upload, UserPlus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { studentsApi } from "@/lib/api/students";
 import { downloadFile } from "@/lib/api/download-file";
-import { ApiError } from "@/lib/api";
 import { useState } from "react";
 import { useResourceTable } from "@/lib/api/use-resource-table";
 import { getStudentColumns } from "./columns/students";
@@ -16,6 +15,7 @@ import { CsvUploadDialog } from "./components/csv-upload-dialog";
 import { AddStudentDialog } from "./components/add-student-dialog";
 import { StudentRecord } from "@/types/students";
 import { EditStudentDialog } from "./components/edit-student-dialog";
+import { ApiError } from "@/lib/api/api-error";
 
 export function StudentsPage() {
   const {

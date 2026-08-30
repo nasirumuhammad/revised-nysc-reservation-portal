@@ -1,15 +1,13 @@
 import { ApiError } from "./api-error";
-import { tokenStorage } from "./token-storage";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BFF_BASE_URL = "/api/bff";
 
 export async function downloadFile(
   path: string,
   filename: string,
 ): Promise<void> {
-  const accessToken = tokenStorage.getAccessToken();
-  const response = await fetch(`${BASE_URL}${path}`, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+  const response = await fetch(`${BFF_BASE_URL}${path}`, {
+    method: "GET",
   });
 
   if (!response.ok) {
@@ -24,6 +22,8 @@ export async function downloadFile(
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }

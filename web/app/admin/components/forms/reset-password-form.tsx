@@ -11,8 +11,8 @@ import FormHeading from "@/components/form-heading";
 import { SubmitButton } from "../../components/submit-button";
 import { PasswordField } from "../../components/password-field";
 import { authApi } from "@/lib/api/auth";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
+import { ApiError } from "@/lib/api/api-error";
 
 type FormSchema = z.infer<typeof resetPasswordSchema>;
 

@@ -16,12 +16,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
           className="sticky top-0"
         />
       </div>
-      <div className="w-full md:w-1/2 ">
-        <div className="relative w-[80px] h-[80px]">
-          <Image src={"/abu-logo.png"} alt="abu logo" fill />
-        </div>
-        {children}
-      </div>
+      <div className="w-full md:w-1/2">{children}</div>
     </div>
   );
 };

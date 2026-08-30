@@ -12,10 +12,10 @@ import { SubmitButton } from "../../components/submit-button";
 import { EmailField } from "../../components/email-field";
 import { BackLink } from "../../components/back-link";
 import { authApi } from "@/lib/api/auth";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 import { AuthLayout } from "../../components/authlayout";
 import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
+import { ApiError } from "@/lib/api/api-error";
 
 type FormSchema = z.infer<typeof forgotPasswordSchema>;
 

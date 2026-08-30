@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { RowSelectionState } from "@tanstack/react-table";
-import { ApiError } from "@/lib/api";
 import { ResourceApi } from "./api-resource";
 import { useDebouncedValue } from "@/hooks/use-debounce-value";
+import { ApiError } from "./api-error";
 
 type UseResourceTableOptions<T> = {
   api: ResourceApi<T>;

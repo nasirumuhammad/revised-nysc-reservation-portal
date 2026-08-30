@@ -10,13 +10,13 @@ import { signinSchema } from "@/schemas/signup.schema";
 import { Button } from "@/components/ui/button";
 import { authApi } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 import { useEffect } from "react";
 import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
 import { FormError } from "../form-error";
 import { EmailField } from "../email-field";
 import { PasswordField } from "../password-field";
+import { ApiError } from "@/lib/api/api-error";
 
 type FormSchema = z.infer<typeof signinSchema>;
 
@@ -85,7 +85,7 @@ const SignInForm = () => {
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Not an admin?{" "}
         <Link
-          href="/auth/signin/student"
+          href="/student"
           className="font-medium text-primary hover:underline"
         >
           Sign in as a student

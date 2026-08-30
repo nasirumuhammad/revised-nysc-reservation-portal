@@ -1,5 +1,5 @@
 import { ApiErrorResponse, ApiSuccessResponse } from "@/types/api";
-import { ApiError } from "../api";
+import { ApiError } from "./api-error";
 
 const BFF_BASE_URL = "/api/bff";
 

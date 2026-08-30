@@ -8,7 +8,6 @@ import z from "zod";
 
 import { verifyOtpSchema } from "@/schemas/verify-otp.schema";
 import { authApi } from "@/lib/api/auth";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 import { BackLink } from "../../components/back-link";
 import { SubmitButton } from "../../components/submit-button";
@@ -18,6 +17,7 @@ import { EmailField } from "../../components/email-field";
 import { ResendOtp } from "../../components/resend-otp";
 import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
 import FormHeading from "@/components/form-heading";
+import { ApiError } from "@/lib/api/api-error";
 
 type FormSchema = z.infer<typeof verifyOtpSchema>;
 

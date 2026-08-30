@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authApi } from "@/lib/api/auth";
-import { tokenStorage } from "@/lib/api/token-storage";
 
 export function StudentLogoutButton() {
   const router = useRouter();
@@ -13,11 +12,18 @@ export function StudentLogoutButton() {
 
   async function handleSignOut() {
     setIsSigningOut(true);
+
     try {
       await authApi.signout();
-    } finally {
-      tokenStorage.clear();
+
       router.push("/student");
+      router.refresh();
+    } catch (error) {
+      console.error("Signout failed:", error);
+      router.push("/student");
+      router.refresh();
+    } finally {
+      setIsSigningOut(false);
     }
   }
 

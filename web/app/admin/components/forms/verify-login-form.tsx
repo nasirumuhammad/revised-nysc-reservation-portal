@@ -8,7 +8,6 @@ import z from "zod";
 
 import { verifyOtpSchema } from "@/schemas/verify-otp.schema";
 import { authApi } from "@/lib/api/auth";
-import { ApiError } from "@/lib/api";
 import { applyFieldErrors } from "@/lib/api/apply-field-error";
 import FormHeading from "@/components/form-heading";
 import { BackLink } from "../../components/back-link";
@@ -17,6 +16,7 @@ import { OtpField } from "../../components/otp-field";
 import { SubmitButton } from "../../components/submit-button";
 import { ResendOtp } from "../../components/resend-otp";
 import { UseFormSubmitState } from "@/hooks/use-form-submit-state";
+import { ApiError } from "@/lib/api/api-error";
 
 type FormSchema = z.infer<typeof verifyOtpSchema>;
 
@@ -42,29 +42,7 @@ function VerifySigninOtpForm() {
 
   async function onSubmit(data: FormSchema) {
     try {
-      const tokens = await authApi.verifySigninOtp(data);
-
-      if (!tokens) {
-        setError("root", {
-          message: "Something went wrong. Please try again.",
-        });
-        return;
-      }
-
-      const response = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(tokens),
-      });
-
-      if (!response.ok) {
-        setError("root", {
-          message: "Unable to create your session. Please try again.",
-        });
-        return;
-      }
+      await authApi.verifySigninOtp(data);
 
       markRedirecting();
       router.push("/admin/students");
@@ -75,9 +53,14 @@ function VerifySigninOtpForm() {
         if (!handled) {
           setError("root", { message: error.message });
         }
+      } else {
+        setError("root", {
+          message: "Something went wrong. Please try again.",
+        });
       }
     }
   }
+
   async function handleResend() {
     if (!email) return;
     await authApi.resendLoginOtp(email);

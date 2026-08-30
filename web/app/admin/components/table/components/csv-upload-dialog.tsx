@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ApiError } from "@/lib/api";
 import { CsvUploadResult } from "@/types/students";
+import { ApiError } from "@/lib/api/api-error";
 
 type CsvUploadDialogProps = {
   open: boolean;
